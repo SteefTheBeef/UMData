@@ -10,9 +10,9 @@
   },
   "author": "",
   "license": "ISC",
-
   "dependencies": {
     "forever-monitor": "^3.0.3",
-    "ftp": "^0.3.10"
+    "ftp": "^0.3.10",
+    "node-fetch": "^3.3.0"
   }
 }

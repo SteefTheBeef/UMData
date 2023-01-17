@@ -20,7 +20,7 @@ class FtpDataFetcher {
       connTimeout: 5000,
       pasvTimeout: 5000,
       debug: (message) => {
-        console.log(message);
+        //console.log(message);
       },
     });
     try {
