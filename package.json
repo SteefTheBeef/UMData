@@ -6,10 +6,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node fetcher.js"
+    "start": "node start-app.js"
   },
   "author": "",
   "license": "ISC",
+
   "dependencies": {
     "forever-monitor": "^3.0.3",
     "ftp": "^0.3.10"
