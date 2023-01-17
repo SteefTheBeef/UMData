@@ -22,8 +22,10 @@ async function test(matchlogResult) {
     //const data = await response.json();
 
     //console.log(data);
-
-    needle.post('https://united-masters.herokuapp.com/api/matchlog', function(error, response) {
+    const data = {
+        matchlogResult
+    }
+    needle.post('https://united-masters.herokuapp.com/api/matchlog', data, function(error, response) {
         if (!error) {
             console.log(response.body);
         }
