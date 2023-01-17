@@ -1,6 +1,6 @@
 const FtpDataFetcher = require('./FtpDataFetcher.js');
 const ftpDataFetcher = new FtpDataFetcher();
-import fetch from 'node-fetch';
+const needle = require('needle');
 
 function fetchData() {
     ftpDataFetcher.connect().then(async () => {
@@ -18,8 +18,19 @@ setTimeout(() => {
 }, 30 * 1000);
 
 async function test(matchlogResult) {
-    const response = await fetch('https://united-masters.herokuapp.com/api/matchlog', {method: 'POST', body: 'kalle'});
-    const data = await response.json();
+    //const response = await fetch('https://united-masters.herokuapp.com/api/matchlog', {method: 'POST', body: 'kalle'});
+    //const data = await response.json();
 
-    console.log(data);
+    //console.log(data);
+
+    needle.post('https://united-masters.herokuapp.com/api/matchlog', function(error, response) {
+        if (!error) {
+            console.log(response.body);
+        }
+
+    });
 }
+
+
+
+

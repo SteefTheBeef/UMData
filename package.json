@@ -13,6 +13,7 @@
   "dependencies": {
     "forever-monitor": "^3.0.3",
     "ftp": "^0.3.10",
+    "needle": "^3.2.0",
     "node-fetch": "^3.3.0"
   }
 }
