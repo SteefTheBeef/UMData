@@ -43,8 +43,6 @@ class MongoChallenge extends MongoType {
       console.log("Challenge exists");
       let createdAt;
       for (let raceRanking of race.raceRankings) {
-        // remove any duplicates
-        this.removeDuplicateRankings(challenge, raceRanking);
 
         const currentPlayer = challenge.findPlayer(raceRanking.playerLogin);
         if (currentPlayer) {
@@ -52,7 +50,7 @@ class MongoChallenge extends MongoType {
           createdAt = raceRanking.createdAt;
         } else {
           // player is unranked on this challenge. Insert new ranking.
-          console.log("RANKING ADDED TO EXISTING CHALLENGE");
+          console.log("PLAYER ADDED TO EXISTING CHALLENGE");
           challenge.addPlayerFromRaceRanking(raceRanking);
           createdAt = raceRanking.createdAt;
         }
@@ -85,15 +83,6 @@ class MongoChallenge extends MongoType {
     }
   }
 
-  removeDuplicateRankings(existingChallenge, ranking) {
-    const existingRankings = existingChallenge.rankings.filter((r) => r.playerLogin === ranking.playerLogin);
-    if (existingRankings.length > 1) {
-      existingRankings.sort(sortByMilliSeconds);
-      for (let i = 1; i < existingRankings.length; i++) {
-        existingChallenge.rankings.splice(this.rankings.indexOf(existingRankings[i]), 1);
-      }
-    }
-  }
 }
 
 module.exports = MongoChallenge;
