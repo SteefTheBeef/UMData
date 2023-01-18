@@ -35,12 +35,8 @@ class RaceFactory {
     const rawCheckpoints = RaceFactory.createCheckpoints(rows);
     const checkpoints = RaceFactory.createNormalCheckpoints(rows);
     const { rawLaps, laps } = RaceFactory.createLaps(rows);
-    //console.log("rawLaps", rawLaps);
-    //console.log("laps", laps);
-    //const bestLaps = RaceFactory.createLaps(rows);
+
     rankings = rankings.map((r) => {
-      console.log(laps);
-      console.log(rawLaps);
       r.laps = laps.filter((l) => l.playerLogin === r.playerLogin);
       if (!r.laps.length) {
         // something went wrong with this player, no laps reported. so exclude
@@ -60,6 +56,8 @@ class RaceFactory {
         }
         lapIndex++;
       }
+
+      r.raceWasCompeleted = raceInfo.numberOfLaps
 
       return new Ranking(r);
     });
@@ -215,12 +213,13 @@ class RaceFactory {
       const items = row.split(",");
       return {
         date: items[0],
-        gameMode: items[1],
-        challengeName: items[2],
-        challengeNameWithColor: items[3],
-        challengeId: items[4],
-        challengeAuthor: items[5],
-        environment: items[6],
+        challengeName: items[1],
+        challengeNameWithColor: items[2],
+        challengeId: items[3],
+        challengeAuthor: items[4],
+        environment: items[5],
+        gameMode: items[6],
+        numberOfLaps: items[7],
       };
     });
 

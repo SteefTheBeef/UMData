@@ -12,6 +12,8 @@ class Race extends MongoType {
     this.challengeNameWithColor = props.challengeNameWithColor;
     this.challengeEnvi = props.challengeEnvi;
     this.challengeAuthorLogin = props.challengeAuthorLogin;
+    this.gameMode = props.gameMode;
+    this.numberOfLaps = props.numberOfLaps;
     this.rankings = props.rankings || [];
     this.checkpoints = props.checkpoints || [];
     this.players = props.players || [];
@@ -52,6 +54,8 @@ class Race extends MongoType {
       challengeName: this.challengeName.trim(),
       challengeEnvi: this.challengeEnvi.trim(),
       challengeAuthorLogin: this.challengeAuthorLogin.trim(),
+      gameMode: this.gameMode,
+      numberOfLaps: this.numberOfLaps,
       rankings: this.rankings.map((ranking) => ranking.toJSON()),
       checkpoints: this.checkpoints.map((checkpoint) => checkpoint.toJSON()),
       laps: this.laps.map((lap) => lap.toJSON()),

@@ -47,7 +47,7 @@ class Fetch {
 
     let players = [];
     let challengesToUpdate = [];
-    let rankings = [];
+
 
     // insert new races
     for (const race of races) {
@@ -55,7 +55,6 @@ class Fetch {
       if ((await race.store()) === 1) {
         players = players.concat(race.players);
         challengesToUpdate.push(race.getChallenge());
-        rankings = rankings.concat(race.getRankingsAsChallengeRecords());
       }
     }
 

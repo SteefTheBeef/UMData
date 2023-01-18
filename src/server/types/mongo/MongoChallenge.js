@@ -37,11 +37,11 @@ class MongoChallenge extends MongoType {
       });
 
       if (!existingChallenge) {
-        // TODO: redudant loops, combine
+
         challenge.updatePoints();
 
         for (let ranking of challenge.rankings) {
-          ranking.addRaceHistory(ranking);
+          ranking.addRaceHistory(ranking, challenge.numberOfLaps);
         }
         console.log("CHALLENGE", challenge);
         challenge.addRankHistory(challenge.getLastRanking().getLastRaceHistory().createdAt);

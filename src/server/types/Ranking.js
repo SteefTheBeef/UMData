@@ -1,6 +1,8 @@
 const TimeUtil = require("../../utils/TimeUtil");
 
 class Ranking {
+  // TODO: split this into two classes.
+  // One for challenge rankings (players) and one for Race Rankings
   constructor(props) {
     this.rank = props.rank;
     this.playerLogin = props.playerLogin;
@@ -24,6 +26,7 @@ class Ranking {
     this.points = props.points;
     this.totalPoints = props.totalPoints;
     this.createdAt = props.createdAt;
+    this.raceWasCompleted = props.raceWasCompleted;
   }
 
   /**
@@ -51,13 +54,14 @@ class Ranking {
 
   updateTimesFromAnotherRanking(otherRanking) {
     let wasUpdated = false;
-    if (otherRanking.timeMs < this.timeMs) {
+    // only update this is the race was completed
+    if (otherRanking.raceWasCompleted && otherRanking.timeMs < this.timeMs) {
       this.timeMs = otherRanking.timeMs;
       this.time = otherRanking.time;
       this.laps = otherRanking.laps;
       wasUpdated = true;
     }
-
+    // bestlap can be updated regardless if the race was completed.
     if (otherRanking.bestLap.timeMs < this.bestLap.timeMs) {
       this.bestLap = otherRanking.bestLap;
       wasUpdated = true;
@@ -66,18 +70,18 @@ class Ranking {
     return wasUpdated;
   }
 
-  addRaceHistory(incomingRanking) {
+  addRaceHistory(incomingRanking, numberOfLapsForCompleteRace) {
     if (!this.raceHistory) {
       this.raceHistory = [];
     }
 
     // only insert if the raceId does not already exist in raceHistory
     if (!this.raceHistory.some((rh) => rh.raceId === incomingRanking.raceId)) {
-      this.raceHistory.push(this.getRaceHistoryObj(incomingRanking));
+      this.raceHistory.push(this.getRaceHistoryObj(incomingRanking, numberOfLapsForCompleteRace));
     }
   }
 
-  getRaceHistoryObj(incomingRanking) {
+  getRaceHistoryObj(incomingRanking, numberOfLapsForCompleteRace) {
     try {
       const totalTimeMs = incomingRanking.laps
         .map((l) => {
@@ -97,6 +101,7 @@ class Ranking {
         avgTime: TimeUtil.millisToMinutes(totalTimeMs / incomingRanking.laps.length),
         rawLaps: incomingRanking.rawLaps,
         rawCheckpoints: incomingRanking.rawCheckpoints,
+        raceWasCompleted: incomingRanking.laps.length === numberOfLapsForCompleteRace
       };
     } catch (e) {
       console.log(e);
@@ -110,7 +115,11 @@ class Ranking {
   }
 
   getNewRankHistoryObj(createdAt) {
-    const lastRaceHistory = this.raceHistory[this.raceHistory.length - 1];
+    const history = this.raceHistory.filter(rh => rh.raceWasCompleted);
+    const lastRaceHistory = history.length ? history[history.length - 1] : {
+      totalTime: null,
+      totalTImeMs: null
+    }
 
     return {
       createdAt: createdAt,
