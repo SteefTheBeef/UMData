@@ -1,5 +1,5 @@
 const MongoType = require("./mongo/MongoType");
-const Challenge = require("./Challenge");
+const Challenge = require("./challenge/Challenge");
 
 class Race extends MongoType {
   constructor(props) {
@@ -14,7 +14,7 @@ class Race extends MongoType {
     this.challengeAuthorLogin = props.challengeAuthorLogin;
     this.gameMode = props.gameMode;
     this.numberOfLaps = props.numberOfLaps;
-    this.rankings = props.rankings || [];
+    this.raceRankings = props.raceRankings || [];
     this.checkpoints = props.checkpoints || [];
     this.players = props.players || [];
     this.laps = props.laps || [];
@@ -31,20 +31,9 @@ class Race extends MongoType {
       name: this.challengeName.trim(),
       nameWithColor: this.challengeNameWithColor.trim(),
       author: this.challengeAuthorLogin.trim(),
-      rankings: this.getRankingsAsChallengeRecords(),
     });
   }
 
-  getRankingsAsChallengeRecords() {
-    return this.rankings.map((ranking) => {
-      ranking.bestLap.raceId = this._id;
-      ranking.createdAt = this.date;
-      ranking.updatedAt = this.date;
-      ranking.raceId = this._id;
-      ranking.challengeId = this.challengeId;
-      return ranking;
-    });
-  }
 
   toJSON() {
     return {
@@ -56,7 +45,7 @@ class Race extends MongoType {
       challengeAuthorLogin: this.challengeAuthorLogin.trim(),
       gameMode: this.gameMode,
       numberOfLaps: this.numberOfLaps,
-      rankings: this.rankings.map((ranking) => ranking.toJSON()),
+      raceRankings: this.raceRankings.map((ranking) => ranking.toJSON()),
       checkpoints: this.checkpoints.map((checkpoint) => checkpoint.toJSON()),
       laps: this.laps.map((lap) => lap.toJSON()),
     };

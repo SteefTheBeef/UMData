@@ -1,6 +1,8 @@
-const TimeUtil = require("../../utils/TimeUtil");
 
-class Ranking {
+const ArrayUtil = require("../../../utils/ArrayUtil");
+const TimeUtil = require("../../../utils/TimeUtil");
+
+class ChallengePlayer {
   // TODO: split this into two classes.
   // One for challenge rankings (players) and one for Race Rankings
   constructor(props) {
@@ -37,12 +39,12 @@ class Ranking {
    * Rank,Lap,Checkpoints,Time,BestLap,CPdelay,Points,Login,NickName
    * @param date
    * @param allPlayers {Player[]}
-   * @returns {Ranking}
+   * @returns {ChallengePlayer}
    */
   static create(rawString, date) {
     const items = rawString.split(",");
 
-    return new Ranking({
+    return new ChallengePlayer({
       rank: parseInt(items[0], 10),
       numberOfLaps: parseInt(items[1], 10),
       numberOfCheckpoints: parseInt(items[2], 10),
@@ -70,20 +72,20 @@ class Ranking {
     return wasUpdated;
   }
 
-  addRaceHistory(incomingRanking, numberOfLapsForCompleteRace) {
+  addRace(newRaceRanking) {
     if (!this.raceHistory) {
       this.raceHistory = [];
     }
 
     // only insert if the raceId does not already exist in raceHistory
-    if (!this.raceHistory.some((rh) => rh.raceId === incomingRanking.raceId)) {
-      this.raceHistory.push(this.getRaceHistoryObj(incomingRanking, numberOfLapsForCompleteRace));
+    if (!this.raceHistory.some((rh) => rh.raceId === newRaceRanking.raceId)) {
+      this.raceHistory.push(this.createRace(newRaceRanking));
     }
   }
 
-  getRaceHistoryObj(incomingRanking, numberOfLapsForCompleteRace) {
+  createRace(newRaceRanking) {
     try {
-      const totalTimeMs = incomingRanking.laps
+      const totalTimeMs = newRaceRanking.laps
         .map((l) => {
           return l.timeMs;
         })
@@ -92,29 +94,29 @@ class Ranking {
         }, 0);
 
       return {
-        raceId: incomingRanking.raceId,
-        createdAt: incomingRanking.createdAt,
-        numberOfLaps: incomingRanking.laps.length,
+        raceId: newRaceRanking.raceId,
+        createdAt: newRaceRanking.createdAt,
+        numberOfLaps: newRaceRanking.laps.length,
         totalTimeMs,
         totalTime: TimeUtil.millisToMinutes(totalTimeMs),
-        avgTimeMs: totalTimeMs / incomingRanking.laps.length,
-        avgTime: TimeUtil.millisToMinutes(totalTimeMs / incomingRanking.laps.length),
-        rawLaps: incomingRanking.rawLaps,
-        rawCheckpoints: incomingRanking.rawCheckpoints,
-        raceWasCompleted: incomingRanking.laps.length === numberOfLapsForCompleteRace
+        avgTimeMs: totalTimeMs / newRaceRanking.laps.length,
+        avgTime: TimeUtil.millisToMinutes(totalTimeMs / newRaceRanking.laps.length),
+        rawLaps: newRaceRanking.rawLaps,
+        rawCheckpoints: newRaceRanking.rawCheckpoints,
+        raceWasCompleted: newRaceRanking.raceWasCompleted
       };
     } catch (e) {
       console.log(e);
-      console.log("error in ranking", incomingRanking);
+      console.log("error in ranking", newRaceRanking);
     }
   }
 
   addRankHistory(createdAt) {
     // always create raceHistory before creating a new rankHistory
-    this.rankHistory.push(this.getNewRankHistoryObj(createdAt));
+    this.rankHistory.push(this.createNewRankHistoryObj(createdAt));
   }
 
-  getNewRankHistoryObj(createdAt) {
+  createNewRankHistoryObj(createdAt) {
     const history = this.raceHistory.filter(rh => rh.raceWasCompleted);
     const lastRaceHistory = history.length ? history[history.length - 1] : {
       totalTime: null,
@@ -143,6 +145,17 @@ class Ranking {
     return this.raceHistory[this.raceHistory.length - 1];
   }
 
+  getLastCompletedRace() {
+    const lastRaces = this.raceHistory.filter(rh => rh.raceWasCompleted);
+    return lastRaces.length ? lastRaces[lastRaces.length - 1] : null;
+  }
+
+  getBestCompletedRace() {
+    const lastRaces = this.raceHistory.filter(rh => rh.raceWasCompleted);
+    lastRaces.sort(ArrayUtil.sortByTimeMs)
+    return lastRaces.length ? lastRaces[lastRaces.length - 1] : null;
+  }
+
   toJSON() {
     return {
       playerLogin: this.playerLogin,
@@ -155,4 +168,4 @@ class Ranking {
   }
 }
 
-module.exports = Ranking;
+module.exports = ChallengePlayer;

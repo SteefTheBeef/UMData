@@ -1,4 +1,5 @@
 const MongoType = require("./MongoType");
+const Challenge = require("../challenge/Challenge");
 
 function sortByMilliSeconds(ranking1, ranking2) {
   return ranking1.timeMs - ranking2.timeMs;
@@ -14,84 +15,61 @@ class MongoChallenge extends MongoType {
     super("c", "Challenge");
   }
 
-  async cleanUp() {
-    //this.deleteTempDataBeforeStorage(this.rankings);
-    await this.collection.updateOne(
-      { _id: this._id },
-      {
-        $set: {
-          rankings: this.rankings,
-        },
-      },
-      {
-        upsert: true,
-      }
-    );
-  }
-
-  async store(challenge) {
+  async store(race) {
     try {
       await this.connect();
       let existingChallenge = await this.collection.findOne({
-        _id: challenge._id,
+        _id: race.challengeId,
       });
 
       if (!existingChallenge) {
+        const challenge = race.getChallenge();
 
-        challenge.updatePoints();
-
-        for (let ranking of challenge.rankings) {
-          ranking.addRaceHistory(ranking, challenge.numberOfLaps);
+        for (let raceRanking of race.raceRankings) {
+          challenge.addPlayerFromRaceRanking(raceRanking);
         }
-        console.log("CHALLENGE", challenge);
-        challenge.addRankHistory(challenge.getLastRanking().getLastRaceHistory().createdAt);
-        challenge.rankings.sort(sortByTotalPoints);
-        //console.log("Challenge Store", this.rankings[0]);
+
+        challenge.setPreviousPointsOnPlayers();
+        challenge.updatePoints();
+        challenge.addRankHistory(challenge.getLastPlayer().getLastRaceHistory().createdAt);
+
         const result = await this.collection.insertOne(challenge.toJSON());
         console.log("Inserted challenge ", result.insertedId, " into the database.");
         return 1;
       }
 
       //UPDATE existing challenge
-      existingChallenge = new Challenge(existingChallenge);
+      const challenge = new Challenge(existingChallenge);
       console.log("Challenge exists");
-
-      let shouldAddHistory = false;
-      let createdAt = null;
-
-      for (let ranking of challenge.rankings) {
+      let createdAt;
+      for (let raceRanking of race.raceRankings) {
         // remove any duplicates
-        this.removeDuplicateRankings(existingChallenge, ranking);
+        this.removeDuplicateRankings(challenge, raceRanking);
 
-        const currentRanking = existingChallenge.findRanking(ranking.playerLogin);
-        if (currentRanking) {
-          //this.setBasicInfo(currentRanking, ranking);
-          currentRanking.addRaceHistory(ranking);
-          const wasUpdated = currentRanking.updateTimesFromAnotherRanking(ranking);
-          if (wasUpdated) {
-            shouldAddHistory = true;
-            createdAt = ranking.createdAt;
-          }
+        const currentPlayer = challenge.findPlayer(raceRanking.playerLogin);
+        if (currentPlayer) {
+          currentPlayer.addRace(raceRanking);
+          createdAt = raceRanking.createdAt;
         } else {
           // player is unranked on this challenge. Insert new ranking.
           console.log("RANKING ADDED TO EXISTING CHALLENGE");
-          existingChallenge.addRanking(ranking);
-          shouldAddHistory = true;
-          createdAt = ranking.createdAt;
+          challenge.addPlayerFromRaceRanking(raceRanking);
+          createdAt = raceRanking.createdAt;
         }
       }
 
-      existingChallenge.updatePoints();
+      challenge.setPreviousPointsOnPlayers();
+      challenge.updatePoints();
 
-      if (shouldAddHistory) {
-        existingChallenge.addRankHistory(createdAt);
+      if (challenge.hasPointsChanged()) {
+        challenge.addRankHistory(createdAt);
       }
 
       await this.collection.updateOne(
-        { _id: existingChallenge._id },
+        { _id: challenge._id },
         {
           $set: {
-            rankings: existingChallenge.rankings.map((r) => r.toJSON()),
+            players: challenge.players.map((r) => r.toJSON()),
           },
         },
         {
@@ -99,7 +77,7 @@ class MongoChallenge extends MongoType {
         }
       );
 
-      console.log("Updated challenge", existingChallenge.name);
+      console.log("Updated challenge", challenge.name);
     } catch (e) {
       console.log(e);
     } finally {

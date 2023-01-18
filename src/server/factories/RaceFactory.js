@@ -1,9 +1,9 @@
-const Ranking = require("../types/Ranking");
 const Race = require("../types/Race");
 const Lap = require("../types/Lap");
 const TimeUtil = require("../../utils/TimeUtil");
 const Checkpoint = require("../types/Checkpoint");
 const Player = require("../types/Player");
+const RaceRanking = require("../types/RaceRanking");
 
 class RaceFactory {
   /**
@@ -31,12 +31,12 @@ class RaceFactory {
 
     const raceInfo = RaceFactory.createRaceInfo(rows);
     const players = RaceFactory.createPlayers(rows, raceInfo.date);
-    let rankings = RaceFactory.createRankings(rows, players, raceInfo.date).filter((r) => !!r);
+    let raceRankings = RaceFactory.createRankings(rows, players, raceInfo.date).filter((r) => !!r);
     const rawCheckpoints = RaceFactory.createCheckpoints(rows);
-    const checkpoints = RaceFactory.createNormalCheckpoints(rows);
+   // const checkpoints = RaceFactory.createNormalCheckpoints(rows);
     const { rawLaps, laps } = RaceFactory.createLaps(rows);
 
-    rankings = rankings.map((r) => {
+    raceRankings = raceRankings.map((r) => {
       r.laps = laps.filter((l) => l.playerLogin === r.playerLogin);
       if (!r.laps.length) {
         // something went wrong with this player, no laps reported. so exclude
@@ -57,21 +57,24 @@ class RaceFactory {
         lapIndex++;
       }
 
-      r.raceWasCompeleted = raceInfo.numberOfLaps
+      console.log("raceWasCompeleted")
+      console.log("raceInfo.numberOfLaps", raceInfo.numberOfLaps)
+      console.log("r.completedLapsCount", r.completedLapsCount)
+      r.raceWasCompleted = raceInfo.numberOfLaps === r.completedLapsCount
 
-      return new Ranking(r);
+      return r;
     });
 
     return new Race({
       date: raceInfo.date,
       gameMode: raceInfo.gameMode,
+      numberOfLaps: raceInfo.numberOfLaps,
       challengeId: raceInfo.challengeId,
       challengeName: raceInfo.challengeName,
       challengeNameWithColor: raceInfo.challengeNameWithColor,
       challengeEnvi: raceInfo.environment,
       challengeAuthorLogin: raceInfo.challengeAuthor,
-      rankings: rankings.filter((r) => !!r),
-      checkpoints,
+      raceRankings: raceRankings.filter((r) => !!r),
       laps,
       players,
     });
@@ -171,7 +174,7 @@ class RaceFactory {
    * @param rows
    * @param players
    * @param date
-   * @returns Ranking[]
+   * @returns RaceRanking[]
    */
   static createRankings(rows, players, date) {
     return RaceFactory.createCollection(rows, "* Scores:", (row) => {
@@ -182,13 +185,14 @@ class RaceFactory {
         const playerLogin = items[0].trim();
         const player = players.find((p) => p.login === playerLogin);
 
-        ranking = new Ranking({
-          rank: parseInt(items[1], 10),
-          numberOfLaps: parseInt(items[2], 10),
-          numberOfCheckpoints: parseInt(items[3], 10),
+        ranking = new RaceRanking({
+          position: parseInt(items[1], 10),
+          completedLapsCount: parseInt(items[2], 10),
+          completedCheckpointsCount: parseInt(items[3], 10),
           time: items[4],
           timeMs: TimeUtil.raceTimeToMilliSeconds(items[4]),
           playerLogin,
+          createdAt: date
         });
 
         if (player) {
@@ -219,7 +223,7 @@ class RaceFactory {
         challengeAuthor: items[4],
         environment: items[5],
         gameMode: items[6],
-        numberOfLaps: items[7],
+        numberOfLaps: parseInt(items[7], 10),
       };
     });
 

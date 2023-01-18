@@ -14,7 +14,7 @@ class Leaderboard {
 
     let shouldAddHistory;
     for (let challenge of challenges) {
-      for (let ranking of challenge.rankings) {
+      for (let ranking of challenge.players) {
         let player = this.players.find((p) => p.playerLogin === ranking.playerLogin);
         if (!player) {
           player = new LeaderboardPlayer({
