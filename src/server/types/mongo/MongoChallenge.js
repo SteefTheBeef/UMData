@@ -47,6 +47,7 @@ class MongoChallenge extends MongoType {
         const currentPlayer = challenge.findPlayer(raceRanking.playerLogin);
         if (currentPlayer) {
           currentPlayer.addRace(raceRanking);
+          currentPlayer.setBestLap(raceRanking);
           createdAt = raceRanking.createdAt;
         } else {
           // player is unranked on this challenge. Insert new ranking.

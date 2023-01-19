@@ -35,6 +35,7 @@ class Fetch {
       if (raceEntry.trim().length > 0 && raceEntry.indexOf("LAPS MATCH") > -1) {
         try {
           const race = RaceFactory.create(raceEntry);
+
           races.push(race);
           //console.log(race.raceRankings);
         } catch (e) {

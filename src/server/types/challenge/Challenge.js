@@ -1,7 +1,11 @@
 const ChallengePlayer = require("./ChallengePlayer");
 
-function sortByMilliSeconds(ranking1, ranking2) {
-  return ranking1.timeMs - ranking2.timeMs;
+function sortByRaceTime(player1, player2) {
+  return player1.bestCompletedRace.totalTimeMs - player2.bestCompletedRace.totalTimeMs;
+}
+
+function sortByBestLap(bestLap1, bestLap2) {
+  return bestLap1.timeMs - bestLap2.timeMs;
 }
 
 // highest first
@@ -77,10 +81,10 @@ class Challenge {
    const onlyCompleted = this.players.map(p => {
     p.bestCompletedRace = p.getBestCompletedRace()
      return p;
-   }).filter(p => p.bestCompletedRace);
+   }).filter(p => !!p.bestCompletedRace);
 
     if (onlyCompleted.length > 1) {
-      onlyCompleted.sort(sortByMilliSeconds);
+      onlyCompleted.sort(sortByRaceTime);
     }
 
     let points = 96;
@@ -103,7 +107,7 @@ class Challenge {
   setPointsOnBestLaps() {
     const bestLaps = this.players.map((r) => r.bestLap);
     if (bestLaps.length > 1) {
-      bestLaps.sort(sortByMilliSeconds);
+      bestLaps.sort(sortByBestLap);
     }
 
     let points = 48;

@@ -4,20 +4,21 @@ const Challenge = require("./challenge/Challenge");
 class Race extends MongoType {
   constructor(props) {
     super("r", "Race", true);
-
-    this._id = new Date(props.date).valueOf();
-    this.date = props.date;
-    this.challengeId = props.challengeId;
-    this.challengeName = props.challengeName;
-    this.challengeNameWithColor = props.challengeNameWithColor;
-    this.challengeEnvi = props.challengeEnvi;
-    this.challengeAuthorLogin = props.challengeAuthorLogin;
-    this.gameMode = props.gameMode;
-    this.numberOfLaps = props.numberOfLaps;
-    this.raceRankings = props.raceRankings || [];
-    this.checkpoints = props.checkpoints || [];
-    this.players = props.players || [];
-    this.laps = props.laps || [];
+    if (props) {
+      this._id = new Date(props.date).valueOf();
+      this.date = props.date;
+      this.challengeId = props.challengeId;
+      this.challengeName = props.challengeName;
+      this.challengeNameWithColor = props.challengeNameWithColor;
+      this.challengeEnvi = props.challengeEnvi;
+      this.challengeAuthorLogin = props.challengeAuthorLogin;
+      this.gameMode = props.gameMode;
+      this.numberOfLaps = props.numberOfLaps;
+      this.raceRankings = props.raceRankings || [];
+      this.checkpoints = props.checkpoints || [];
+      this.players = props.players || [];
+      this.laps = props.laps || [];
+    }
   }
 
   async store() {

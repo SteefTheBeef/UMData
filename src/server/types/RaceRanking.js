@@ -4,7 +4,7 @@ class RaceRanking {
   constructor(props) {
     this.playerLogin = props.playerLogin;
     this.playerNickName = props.playerNickName;
-    this.playerNickNameWithColor = props.playerNickName;
+    this.playerNickNameWithColor = props.playerNickNameWithColor;
 
     this.challengeId = props.challengeId;
     this.raceId = props.raceId;
@@ -28,7 +28,7 @@ class RaceRanking {
     return {
       playerLogin: this.playerLogin,
       playerNickName: this.playerNickName,
-      playerNickNameWithColor: this.playerNickName,
+      playerNickNameWithColor: this.playerNickNameWithColor,
       challengeId: this.challengeId,
       raceId: this.raceId,
       position: this.position,

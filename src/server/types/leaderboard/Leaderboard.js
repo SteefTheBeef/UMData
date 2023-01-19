@@ -36,7 +36,6 @@ class Leaderboard {
           if (!player.prevValues) {
             // store the or previous values, so that we can compare with them later
             // to see if any changes has been made, if so we update/add history.
-            console.log("ADDED prevValues");
             player.prevValues = {
               points: player.points,
               bestLapPoints: player.bestLapPoints,

@@ -52,6 +52,17 @@ class MongoType {
     }
   }
 
+  async drop() {
+    try {
+      await this.connect();
+      return await this.collection.drop();
+    } catch (e) {
+      console.log(e);
+    } finally {
+      await this.close();
+    }
+  }
+
   toJSON() {}
 }
 

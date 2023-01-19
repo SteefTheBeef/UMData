@@ -9,7 +9,7 @@ class ChallengePlayer {
     this.rank = props.rank;
     this.playerLogin = props.playerLogin;
     this.playerNickName = props.playerNickName;
-    this.playerNickNameWithColor = props.playerNickName;
+    this.playerNickNameWithColor = props.playerNickNameWithColor;
     this.challengeId = props.challengeId;
     this.bestLap = props.bestLap;
     this.rankHistory = props.rankHistory || [];
@@ -156,7 +156,14 @@ class ChallengePlayer {
     return lastRaces.length ? lastRaces[lastRaces.length - 1] : null;
   }
 
+  setBestLap(newRaceRanking) {
+    if(newRaceRanking.bestLap.timeMs < this.bestLap.timeMs) {
+      this.bestLap = newRaceRanking.bestLap;
+    }
+  }
+
   toJSON() {
+
     return {
       playerLogin: this.playerLogin,
       playerNickName: this.playerNickName,

@@ -57,9 +57,6 @@ class RaceFactory {
         lapIndex++;
       }
 
-      console.log("raceWasCompeleted")
-      console.log("raceInfo.numberOfLaps", raceInfo.numberOfLaps)
-      console.log("r.completedLapsCount", r.completedLapsCount)
       r.raceWasCompleted = raceInfo.numberOfLaps === r.completedLapsCount
 
       return r;
@@ -201,6 +198,7 @@ class RaceFactory {
         }
       }
 
+      //console.log(ranking.playerNickNameWithColor);
       return ranking;
     });
   }
