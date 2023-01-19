@@ -35,7 +35,8 @@ class MongoChallenge extends MongoType {
 
         const result = await this.collection.insertOne(challenge.toJSON());
         console.log("Inserted challenge ", result.insertedId, " into the database.");
-        return 1;
+        const chall =  await this.collection.findOne({ _id: result.insertedId });
+        return new Challenge(chall);
       }
 
       //UPDATE existing challenge
@@ -77,6 +78,8 @@ class MongoChallenge extends MongoType {
       );
 
       console.log("Updated challenge", challenge.name);
+      const chall =  await this.collection.findOne({ _id: challenge._id });
+      return new Challenge(chall);
     } catch (e) {
       console.log(e);
     } finally {

@@ -6,6 +6,6 @@ fetch.fetchMatchlog();
 
 setInterval(() => {
     fetch.fetchMatchlog();
-}, 60 * 1000);
+}, 180 * 1000);
 
 

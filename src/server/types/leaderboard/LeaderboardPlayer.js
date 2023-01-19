@@ -23,6 +23,13 @@ class LeaderboardPlayer {
     this.bestLapPoints = 0;
   }
 
+  setPrevValues() {
+    this.prevValues = {
+      racePoints: this.racePoints,
+      bestLapPoints: this.bestLapPoints
+    }
+  }
+
   addRankHistory() {
     // always create raceHistory before creating a new rankHistory
     this.rankHistory.push(this.getNewRankHistoryObj());

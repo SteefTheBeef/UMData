@@ -9,11 +9,12 @@ class Leaderboard {
 
   updatePoints(challenges) {
     this.players.forEach((player) => {
+      player.setPrevValues();
       player.resetPoints();
     });
 
     let shouldAddHistory;
-    for (let challenge of challenges) {
+    for(let challenge of challenges) {
       for (let challengePlayer of challenge.players) {
         let player = this.players.find((p) => p.playerLogin === challengePlayer.playerLogin);
         if (!player) {
@@ -22,25 +23,19 @@ class Leaderboard {
             playerNickName: challengePlayer.playerNickName,
             playerNickNameWithColor: challengePlayer.playerNickNameWithColor,
             racePoints: 0,
+            bestLapPoints: 0,
+            totalPoints: 0,
             position: 999,
             prevValues: {
               racePoints: 0,
-              bestLapPoints: 0,
-            },
+              bestLapPoints: 0
+            }
           });
 
           this.players.push(player);
           // always add history when a new player is added.
           shouldAddHistory = true;
         } else {
-          if (!player.prevValues) {
-            // store the or previous values, so that we can compare with them later
-            // to see if any changes has been made, if so we update/add history.
-            player.prevValues = {
-              points: player.points,
-              bestLapPoints: player.bestLapPoints,
-            };
-          }
           player.playerNickName = challengePlayer.playerNickName;
           player.playerNickNameWithColor = challengePlayer.playerNickNameWithColor;
         }
@@ -50,8 +45,16 @@ class Leaderboard {
         player.updatedAt = lastRank.createdAt;
         player.racePoints += lastRank.points;
         player.bestLapPoints += lastRank.bestLapPoints;
+
       }
     }
+
+    this.players.forEach((p) => {
+      p.prevValues = {
+        racePoints: p.racePoints,
+        bestLapPoints: p.bestLapPoints,
+      };
+    });
 
     this.players.forEach((p) => {
       p.totalPoints = p.racePoints + p.bestLapPoints;

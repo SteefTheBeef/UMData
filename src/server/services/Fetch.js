@@ -54,7 +54,12 @@ class Fetch {
       //console.log(race.players);
       if ((await race.store()) === 1) {
         players = players.concat(race.players);
-        await mongoChallenge.store(race);
+        const challenge = await mongoChallenge.store(race);
+        const temp = await mongoChallenge.getAll();
+        const challenges = temp.map((t) => {
+          return new Challenge(t);
+        });
+        await mongoLeaderboard.store(new Leaderboard({}), challenges);
       }
     }
 
@@ -63,12 +68,7 @@ class Fetch {
       await player.store();
     }
 
-    const temp = await mongoChallenge.getAll();
-    const challenges = temp.map((t) => {
-      return new Challenge(t);
-    });
 
-    await mongoLeaderboard.store(new Leaderboard({}), challenges);
   }
 }
 
