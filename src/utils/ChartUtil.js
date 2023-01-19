@@ -50,14 +50,16 @@ class ChartUtil {
     };
   }
 
-  static getDataTimeDiff(ranking, otherRanking) {
-    if (!otherRanking) {
+  static getDataTimeDiff(player, otherPlayer) {
+    if (!otherPlayer) {
       return null;
     }
-    const checkpoints1 = ranking.getFastestRace().getCheckpoints();
-    const checkpoints2 = otherRanking.getFastestRace().getCheckpoints();
+    const checkpoints1 = player.getFastestRace().getCheckpoints();
+    const checkpoints2 = otherPlayer.getFastestRace().getCheckpoints();
     //console.log("checkpoints1", checkpoints1);
-    //console.log("checkpoints2", checkpoints2);
+
+    console.log("otherPlayer", otherPlayer);
+    console.log("checkpoints2", checkpoints2);
     const resultDiff = checkpoints1.map((c, index) => {
       return c.timeMs - checkpoints2[index].timeMs;
     });

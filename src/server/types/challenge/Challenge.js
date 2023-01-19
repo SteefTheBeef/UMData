@@ -129,6 +129,10 @@ class Challenge {
     }
 
     this.players.sort(sortByTotalPoints);
+
+    this.players.forEach((p, index) => {
+      p.position = index + 1;
+    })
   }
 
   toJSON() {

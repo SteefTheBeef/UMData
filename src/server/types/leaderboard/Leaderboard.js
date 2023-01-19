@@ -14,17 +14,17 @@ class Leaderboard {
 
     let shouldAddHistory;
     for (let challenge of challenges) {
-      for (let ranking of challenge.players) {
-        let player = this.players.find((p) => p.playerLogin === ranking.playerLogin);
+      for (let challengePlayer of challenge.players) {
+        let player = this.players.find((p) => p.playerLogin === challengePlayer.playerLogin);
         if (!player) {
           player = new LeaderboardPlayer({
-            playerLogin: ranking.playerLogin,
-            playerNickName: ranking.playerNickName,
-            playerNickNameWithColor: ranking.playerNickNameWithColor,
-            points: 0,
+            playerLogin: challengePlayer.playerLogin,
+            playerNickName: challengePlayer.playerNickName,
+            playerNickNameWithColor: challengePlayer.playerNickNameWithColor,
+            racePoints: 0,
             position: 999,
             prevValues: {
-              points: 0,
+              racePoints: 0,
               bestLapPoints: 0,
             },
           });
@@ -41,12 +41,12 @@ class Leaderboard {
               bestLapPoints: player.bestLapPoints,
             };
           }
-          player.playerNickName = ranking.playerNickName;
-          player.playerNickNameWithColor = ranking.playerNickNameWithColor;
+          player.playerNickName = challengePlayer.playerNickName;
+          player.playerNickNameWithColor = challengePlayer.playerNickNameWithColor;
         }
 
         // TODO: change updatedAt...
-        const lastRank = ranking.getLastRankHistory();
+        const lastRank = challengePlayer.getLastRankHistory();
         player.updatedAt = lastRank.createdAt;
         player.racePoints += lastRank.points;
         player.bestLapPoints += lastRank.bestLapPoints;
@@ -56,14 +56,26 @@ class Leaderboard {
     this.players.forEach((p) => {
       p.totalPoints = p.racePoints + p.bestLapPoints;
       //console.log(p);
-      if (p.prevValues.points !== p.points || p.prevValues.bestLapPoints !== p.bestLapPoints) {
+      if (p.prevValues.racePoints !== p.racePoints || p.prevValues.bestLapPoints !== p.bestLapPoints) {
         shouldAddHistory = true;
       }
     });
 
-    this.players.sort(ArrayUtil.sortByPoints);
+    // before points sort:
+    console.log("before points sort");
     this.players.forEach((p, index) => {
-      p.points = index + 1;
+      console.log(index, p.playerLogin, p.racePoints)
+    });
+
+    this.players.sort(ArrayUtil.sortByRacePoints);
+    this.players.forEach((p, index) => {
+      p.position = index + 1;
+    });
+
+    // after points sort:
+    console.log("after points sort");
+    this.players.forEach((p, index) => {
+      console.log(index, p.playerLogin, p.racePoints)
     });
 
     this.players.sort(ArrayUtil.sortByBestLapPoints);
@@ -71,9 +83,21 @@ class Leaderboard {
       p.bestLapPosition = index + 1;
     });
 
+    // after points sort:
+    console.log("after best lap sort");
+    this.players.forEach((p, index) => {
+      console.log(index, p.playerLogin, p.bestLapPoints)
+    });
+
     this.players.sort(ArrayUtil.sortByTotalPoints);
     this.players.forEach((p, index) => {
       p.totalPosition = index + 1;
+    });
+
+    // after points sort:
+    console.log("after total points sort");
+    this.players.forEach((p, index) => {
+      console.log(index, p.playerLogin, p.totalPoints)
     });
 
     return shouldAddHistory;

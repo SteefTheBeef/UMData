@@ -57,12 +57,15 @@ class RaceFactory {
         lapIndex++;
       }
 
+      r.raceId = raceInfo._id;
+      r.challengeId = raceInfo.challengeId;
       r.raceWasCompleted = raceInfo.numberOfLaps === r.completedLapsCount
 
       return r;
     });
 
     return new Race({
+      _id: raceInfo._id,
       date: raceInfo.date,
       gameMode: raceInfo.gameMode,
       numberOfLaps: raceInfo.numberOfLaps,
@@ -214,6 +217,7 @@ class RaceFactory {
     const result = RaceFactory.createCollection(rows, "* Race info:", (row) => {
       const items = row.split(",");
       return {
+        _id: new Date( items[0]).valueOf(),
         date: items[0],
         challengeName: items[1],
         challengeNameWithColor: items[2],

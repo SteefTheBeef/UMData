@@ -5,7 +5,7 @@ class Race extends MongoType {
   constructor(props) {
     super("r", "Race", true);
     if (props) {
-      this._id = new Date(props.date).valueOf();
+      this._id = props._id;
       this.date = props.date;
       this.challengeId = props.challengeId;
       this.challengeName = props.challengeName;

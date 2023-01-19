@@ -4,15 +4,15 @@ class ArrayUtil {
   }
 
   static sortByBestLapPoints(record1, record2) {
-    return record1.bestLapPoints - record2.bestLapPoints;
+    return record2.bestLapPoints - record1.bestLapPoints;
   }
 
-  static sortByPoints(record1, record2) {
-    return record1.points - record2.points;
+  static sortByRacePoints(record1, record2) {
+    return record2.racePoints - record1.racePoints;
   }
 
   static sortByTotalPoints(record1, record2) {
-    return record1.totalPoints - record2.totalPoints;
+    return record2.totalPoints - record1.totalPoints;
   }
 
   static sortByColumn(arr, column, ascending = true) {
