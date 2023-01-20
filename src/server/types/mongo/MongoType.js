@@ -26,14 +26,16 @@ class MongoType {
   async insertOrUpdate(item, callback) {
     try {
       await this.connect();
-      const hasItem = await this.collection.findOne({ _id: item._id });
+      let hasItem = await this.collection.findOne({ _id: item._id });
       if (hasItem) {
         console.log(`${this.itemName} exists in database. Maybe update?`);
         callback && (await callback());
+        hasItem = null;
         return 2;
       } else {
-        const result = await this.collection.insertOne(item.toJSON());
+        let result = await this.collection.insertOne(item.toJSON());
         console.log(`${this.itemName} ${result.insertedId} inserted into the database.`);
+        result = null;
         return 1;
       }
     } finally {

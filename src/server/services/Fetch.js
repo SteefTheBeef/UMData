@@ -29,7 +29,7 @@ class Fetch {
 
     let races = [];
 
-    const logEntries = matchlog.split("###");
+    let logEntries = matchlog.split("###");
     for (let raceEntry of logEntries) {
       //console.log(raceEntry);
       if (raceEntry.trim().length > 0 && raceEntry.indexOf("LAPS MATCH") > -1) {
@@ -42,6 +42,9 @@ class Fetch {
           console.log(e);
         }
       }
+
+
+      logEntries = [];
     }
 
     // filter out races that does not have any participants.
@@ -56,10 +59,12 @@ class Fetch {
         players = players.concat(race.players);
         const challenge = await mongoChallenge.store(race);
         const temp = await mongoChallenge.getAll();
-        const challenges = temp.map((t) => {
+        let challenges = temp.map((t) => {
           return new Challenge(t);
         });
         await mongoLeaderboard.store(new Leaderboard({}), challenges);
+        // clear mem
+        challenges = [];
       }
     }
 
@@ -68,6 +73,9 @@ class Fetch {
       await player.store();
     }
 
+    // clear mem
+    players = [];
+    races = [];
 
   }
 }

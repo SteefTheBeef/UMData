@@ -23,7 +23,7 @@ class MongoChallenge extends MongoType {
       });
 
       if (!existingChallenge) {
-        const challenge = race.getChallenge();
+        let challenge = race.getChallenge();
 
         for (let raceRanking of race.raceRankings) {
           challenge.addPlayerFromRaceRanking(raceRanking);
@@ -34,13 +34,14 @@ class MongoChallenge extends MongoType {
         challenge.addRankHistory(challenge.getLastPlayer().getLastRaceHistory().createdAt);
 
         const result = await this.collection.insertOne(challenge.toJSON());
+        challenge = null;
         console.log("Inserted challenge ", result.insertedId, " into the database.");
         const chall =  await this.collection.findOne({ _id: result.insertedId });
         return new Challenge(chall);
       }
 
       //UPDATE existing challenge
-      const challenge = new Challenge(existingChallenge);
+      let challenge = new Challenge(existingChallenge);
       console.log("Challenge exists");
       let createdAt;
       for (let raceRanking of race.raceRankings) {
@@ -76,6 +77,9 @@ class MongoChallenge extends MongoType {
           upsert: true,
         }
       );
+
+      // clear memory
+      challenge = null;
 
       console.log("Updated challenge", challenge.name);
       const chall =  await this.collection.findOne({ _id: challenge._id });

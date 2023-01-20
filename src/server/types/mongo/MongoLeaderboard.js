@@ -30,6 +30,8 @@ class MongoLeaderboard extends MongoType {
           upsert: true,
         }
       );
+
+      currentLeaderboard = null;
     } catch (e) {
       console.log(e);
     } finally {
