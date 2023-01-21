@@ -26,7 +26,15 @@ class MongoChallenge extends MongoType {
         let challenge = race.getChallenge();
 
         for (let raceRanking of race.raceRankings) {
-          challenge.addPlayerFromRaceRanking(raceRanking);
+          const player = challenge.addPlayerFromRaceRanking(raceRanking);
+          player.setBestLap(raceRanking);
+          player.setBestRace(raceRanking, raceRanking.createdAt, challenge.envi);
+        }
+
+        if (challenge.envi === "Alpine") {
+          console.log(race.date);
+          console.log(challenge.players[0].playerLogin)
+          console.log(challenge.players[0].bestRace)
         }
 
         challenge.setPreviousPointsOnPlayers();
@@ -42,20 +50,24 @@ class MongoChallenge extends MongoType {
 
       //UPDATE existing challenge
       let challenge = new Challenge(existingChallenge);
-      console.log("Challenge exists");
+      //console.log("Challenge exists");
       let createdAt;
       for (let raceRanking of race.raceRankings) {
 
-        const currentPlayer = challenge.findPlayer(raceRanking.playerLogin);
+        let currentPlayer = challenge.findPlayer(raceRanking.playerLogin);
         if (currentPlayer) {
+          createdAt = raceRanking.createdAt;
           currentPlayer.addRace(raceRanking);
           currentPlayer.setBestLap(raceRanking);
-          createdAt = raceRanking.createdAt;
+          currentPlayer.setBestRace(raceRanking, createdAt, challenge.envi);
+
         } else {
           // player is unranked on this challenge. Insert new ranking.
-          console.log("PLAYER ADDED TO EXISTING CHALLENGE");
-          challenge.addPlayerFromRaceRanking(raceRanking);
+          // console.log("PLAYER ADDED TO EXISTING CHALLENGE");
           createdAt = raceRanking.createdAt;
+          currentPlayer = challenge.addPlayerFromRaceRanking(raceRanking);
+          currentPlayer.setBestLap(raceRanking);
+          currentPlayer.setBestRace(raceRanking, createdAt, challenge.envi);
         }
       }
 
@@ -78,11 +90,14 @@ class MongoChallenge extends MongoType {
         }
       );
 
+      // console.log("Updated challenge", challenge.name);
+
+
+      const chall =  await this.collection.findOne({ _id: challenge._id });
+
       // clear memory
       challenge = null;
 
-      console.log("Updated challenge", challenge.name);
-      const chall =  await this.collection.findOne({ _id: challenge._id });
       return new Challenge(chall);
     } catch (e) {
       console.log(e);

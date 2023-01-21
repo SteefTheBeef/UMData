@@ -1,17 +1,18 @@
 
 const ArrayUtil = require("../../../utils/ArrayUtil");
 const TimeUtil = require("../../../utils/TimeUtil");
+const BestRace = require("./BestRace");
 
 class ChallengePlayer {
   // TODO: split this into two classes.
   // One for challenge rankings (players) and one for Race Rankings
   constructor(props) {
-    this.rank = props.rank;
     this.playerLogin = props.playerLogin;
     this.playerNickName = props.playerNickName;
     this.playerNickNameWithColor = props.playerNickNameWithColor;
     this.challengeId = props.challengeId;
     this.bestLap = props.bestLap;
+    this.bestRace = new BestRace(props.bestRace);
     this.rankHistory = props.rankHistory || [];
     this.raceHistory = props.raceHistory || [];
 
@@ -162,16 +163,46 @@ class ChallengePlayer {
     }
   }
 
+  setBestRace(newRaceRanking, updatedAt, envi) {
+    if (!this.bestRace || newRaceRanking.completedCheckpointsCount > this.bestRace.completedCheckpointsCount) {
+      this.addBestRace(newRaceRanking, updatedAt);
+    } else if(newRaceRanking.completedCheckpointsCount === this.bestRace.completedCheckpointsCount) {
+      if (newRaceRanking.raceTimeMs < this.bestRace.raceTimeMs) {
+        this.addBestRace(newRaceRanking, updatedAt);
+      }
+    }
+  }
+
+  addBestRace(newRaceRanking, updatedAt) {
+    this.bestRace = new BestRace({
+      playerLogin: newRaceRanking.playerLogin,
+      raceId: newRaceRanking.raceId,
+      updatedAt,
+      raceTimeMs: newRaceRanking.raceTimeMs,
+      raceTime: newRaceRanking.raceTime,
+      rawLaps: newRaceRanking.rawLaps,
+      rawCheckpoints: newRaceRanking.rawCheckpoints,
+      raceWasCompleted: newRaceRanking.raceWasCompleted,
+      completedLapsCount: newRaceRanking.completedLapsCount,
+      completedCheckpointsCount: newRaceRanking.completedCheckpointsCount,
+    })
+  }
+
   toJSON() {
 
-    return {
+    const p = {
       playerLogin: this.playerLogin,
       playerNickName: this.playerNickName,
       playerNickNameWithColor: this.playerNickNameWithColor,
       bestLap: this.bestLap,
+      bestRace: this.bestRace.toJSON(),
       rankHistory: this.rankHistory,
       raceHistory: this.raceHistory,
     };
+
+    return p;
+
+    //console.log(p.playerLogin, p.bestRace);
   }
 }
 

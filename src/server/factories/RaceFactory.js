@@ -189,8 +189,8 @@ class RaceFactory {
           position: parseInt(items[1], 10),
           completedLapsCount: parseInt(items[2], 10),
           completedCheckpointsCount: parseInt(items[3], 10),
-          time: items[4],
-          timeMs: TimeUtil.raceTimeToMilliSeconds(items[4]),
+          raceTime: items[4],
+          raceTimeMs: TimeUtil.raceTimeToMilliSeconds(items[4]),
           playerLogin,
           createdAt: date
         });

@@ -46,7 +46,6 @@ class Fetch {
 
       logEntries = [];
     }
-
     // filter out races that does not have any participants.
     races = races.filter((race) => race.raceRankings.length > 0);
 
@@ -54,7 +53,6 @@ class Fetch {
 
     // insert new races
     for (const race of races) {
-      //console.log(race.players);
       if ((await race.store()) === 1) {
         players = players.concat(race.players);
         const challenge = await mongoChallenge.store(race);

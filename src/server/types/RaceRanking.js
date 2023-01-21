@@ -15,8 +15,8 @@ class RaceRanking {
     this.rawCheckpoints = props.rawCheckpoints;
     this.rawLaps = props.rawLaps;
 
-    this.time = props.time;
-    this.timeMs = props.timeMs;
+    this.raceTime = props.raceTime;
+    this.raceTimeMs = props.raceTimeMs;
 
     this.completedLapsCount = props.completedLapsCount;
     this.completedCheckpointsCount = props.completedCheckpointsCount;
@@ -36,8 +36,8 @@ class RaceRanking {
       laps: this.laps,
       rawCheckpoints: this.rawCheckpoints,
       rawLaps: this.rawLaps,
-      time: this.time,
-      timeMs: this.timeMs,
+      raceTime: this.raceTime,
+      raceTimeMs: this.raceTimeMs,
       completedLapsCount: this.completedLapsCount,
       completedCheckpointsCount: this.completedCheckpointsCount,
       createdAt: this.createdAt,

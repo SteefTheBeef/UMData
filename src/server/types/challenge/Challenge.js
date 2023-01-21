@@ -1,7 +1,7 @@
 const ChallengePlayer = require("./ChallengePlayer");
 
 function sortByRaceTime(player1, player2) {
-  return player1.bestCompletedRace.totalTimeMs - player2.bestCompletedRace.totalTimeMs;
+  return player1.bestRace.raceTimeMs - player2.bestRace.raceTimeMs;
 }
 
 function sortByBestLap(bestLap1, bestLap2) {
@@ -21,7 +21,16 @@ class Challenge {
     this.nameWithColor = props.nameWithColor;
     this.author = props.author;
     this.players = props.players || [];
-    this.players = this.players.map((r) => new ChallengePlayer(r));
+    this.players = this.players.map((r) => {
+      return r ? new ChallengePlayer(r) : null;
+    }).filter(r => !!r);
+    this.players.forEach(p => {
+      if(p) {
+        //console.log("new Challenge", p.bestRace);
+      }
+
+    })
+
   }
 
   findPlayer(playerLogin) {
@@ -57,7 +66,7 @@ class Challenge {
     newPlayer.addRace(raceRanking);
 
     this.players.push(newPlayer);
-    return this.players[this.players.length - 1];
+    return newPlayer;
   }
 
   getLastPlayer() {
@@ -79,9 +88,12 @@ class Challenge {
   setRegularPoints() {
     // only set points from completed races
    const onlyCompleted = this.players.map(p => {
-    p.bestCompletedRace = p.getBestCompletedRace()
-     return p;
-   }).filter(p => !!p.bestCompletedRace);
+     if(p.bestRace && p.bestRace.raceWasCompleted) {
+       return p;
+     } else {
+       return null;
+     }
+   }).filter(p => !!p);
 
     if (onlyCompleted.length > 1) {
       onlyCompleted.sort(sortByRaceTime);
@@ -93,6 +105,16 @@ class Challenge {
       player.points = 0;
     }
 
+/*    if (this.envi === "Alpine") {
+      console.log("============================");
+      console.log("PLAYERS BEFORE REGULAR SORT");
+      console.log("Envi:", this.envi);
+      this.players.forEach(p => {
+        console.log("login: ",p.playerLogin, "points: ", p.points, "raceTimeMs: ", p.bestRace.raceTimeMs);
+      })
+    }*/
+
+
     for (let player of onlyCompleted) {
       player.points = points;
       player.position = position;
@@ -102,6 +124,15 @@ class Challenge {
       points -= 2;
       position++;
     }
+
+/*    if (this.envi === "Alpine") {
+      console.log("============================");
+      console.log("PLAYERS AFTER REGULAR SORT");
+      console.log("Envi:", this.envi);
+      this.players.forEach(p => {
+        console.log("login: ",p.playerLogin, "points: ", p.points, "raceTimeMs: ", p.bestRace.raceTimeMs);
+      })
+    }*/
   }
 
   setPointsOnBestLaps() {
