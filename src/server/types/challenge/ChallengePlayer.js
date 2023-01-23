@@ -11,7 +11,7 @@ class ChallengePlayer {
     this.playerNickName = props.playerNickName;
     this.playerNickNameWithColor = props.playerNickNameWithColor;
     this.challengeId = props.challengeId;
-    this.bestLap = props.bestLap;
+    this.bestLap = props.bestLap || {};
     this.bestRace = new BestRace(props.bestRace);
     this.rankHistory = props.rankHistory || [];
     this.raceHistory = props.raceHistory || [];
@@ -188,8 +188,12 @@ class ChallengePlayer {
     })
   }
 
-  toJSON() {
+  exportAsString() {
+    const lastRank = this.getLastRankHistory();
+    return `${this.playerLogin},${this.playerNickNameWithColor},${lastRank.position},${this.bestRace.raceTime},${this.bestRace.raceWasCompleted}`
+  }
 
+  toJSON() {
     const p = {
       playerLogin: this.playerLogin,
       playerNickName: this.playerNickName,
