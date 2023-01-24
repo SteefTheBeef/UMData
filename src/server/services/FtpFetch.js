@@ -28,14 +28,30 @@ class FtpFetch {
             }
         })
 
+        // const replays = [];
+
         return new Promise(async function (reso, rej) {
+
             console.log("Connecting to ftp...");
             const ftp = new PromiseFtp();
             ftp
             .connect({ host: "ftp.nc1.eu", user: "n71281", password: "ivwelme28" })
-            .then(function (serverMessage) {
+            .then(async (serverMessage) => {
+
                 console.log("Connection established.");
                 console.log("Downloading matchlog...");
+/*                const replayList = await ftp.listSafe(["/TMF07885/Tracks/Replays/UM"])
+                let index = 0;
+
+                if (replayList && replayList.length > 0) {
+                    for (let rep of replayList) {
+                        const replay = await ftp.get(`/TMF07885/Tracks/Replays/UM/${rep.name}`);
+                        const data = await FtpUtil.streamToBinary(replay);
+                        replays.push({fileName: rep.name, size: rep.size, data});
+                    }
+                }*/
+
+
                 result.forEach(r => {
                     ftp.put(Readable.from(r.playerStrings.join("\n")), `/TMF07885/Controllers/FAST/data/um/${r.envi}.txt`);
                 })
@@ -48,7 +64,7 @@ class FtpFetch {
                     stream.once("error", reject);
                     const string = await FtpUtil.streamToString(stream);
                     console.log("Downloading matchlog done.");
-                    reso(string);
+                    reso([string, null]);
                     // stream.pipe(fs.createWriteStream("matchlog.txt"));
                 });
             })

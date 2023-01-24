@@ -6,8 +6,14 @@ const MongoChallenge = require("../types/mongo/MongoChallenge");
 const MongoLeaderboard = require("../types/mongo/MongoLeaderboard");
 const Leaderboard = require("../types/leaderboard/Leaderboard");
 const Challenge = require("../types/challenge/Challenge");
+const Replay = require("../types/Replay");
+const MongoReplay = require("../types/mongo/MongoReplay");
+const ReplayData = require("../types/ReplayData");
+const MongoReplayData = require("../types/mongo/MongoReplayData");
 const mongoLeaderboard = new MongoLeaderboard();
 const mongoChallenge = new MongoChallenge();
+const mongoReplay = new MongoReplay();
+const mongoReplayData = new MongoReplayData();
 
 
 class Fetch {
@@ -29,7 +35,37 @@ class Fetch {
 
     let races = [];
 
-    let logEntries = matchlog.split("###");
+    let logEntries = matchlog[0].split("###");
+    //console.log("matchlog[1]", matchlog[1])
+/*    const newReps = [];
+    const newRepsData = [];
+    const replays = matchlog[1].forEach(r => {
+      const rep = Replay.create(r);
+      const repData = new ReplayData({
+        replayId: rep._id,
+        data: r.data
+      });
+
+      newReps.push(rep);
+      newRepsData.push(repData);
+    })
+
+    const existingReplays = await mongoReplay.getAll();
+    let index = 0;
+    for (let r of newReps) {
+      const hasBetter = existingReplays.some(rep => {
+        return rep.challengeName === r.challengeName && rep.playerLogin === r.playerLogin && rep.timeMs <= r.timeMs;
+      })
+
+      //only insert replay if it is better than the current best one
+      if (!hasBetter) {
+        await mongoReplay.store(r);
+        await mongoReplayData.store(newRepsData[index]);
+      }
+      index++;
+    }*/
+
+
     for (let raceEntry of logEntries) {
       //console.log(raceEntry);
       if (raceEntry.trim().length > 0 && raceEntry.indexOf("LAPS MATCH") > -1) {

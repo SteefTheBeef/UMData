@@ -38,6 +38,23 @@ class TimeUtil {
   static addLeadingZero(number) {
     return number < 10 ? `0${number}` : number.toString();
   }
+
+  static getMillisFromReplayName(replayName) {
+    try {
+      const first = replayName.split("(");
+      const time = first[1].split(")")[0];
+      const msArr = time.split("''");
+      const ms = parseInt(msArr[1], 10);
+      const seconds = parseInt(msArr[0].split("'")[1]);
+      const minutes = parseInt(msArr[0].split("'")[0]);
+
+
+      return minutes * 60 * 1000 + seconds * 1000 + ms;
+    } catch(e) {
+      console.log(e);
+      return 0;
+    }
+  }
 }
 
 module.exports = TimeUtil;
