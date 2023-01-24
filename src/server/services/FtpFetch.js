@@ -14,10 +14,12 @@ class FtpFetch {
         const challengesArr = await mongoChallenge.getAll();
         const challenges = challengesArr.map(c => new Challenge(c));
 
-        console.log(leaderboards);
-        const lbString = leaderboards[0].players.map(p => {
-            return `${p.playerLogin},${p.playerNickNameWithColor},${p.totalPosition},${p.totalPoints}`
-        });
+        let lbString;
+        if (leaderboards.length) {
+            lbString = leaderboards[0].players.map(p => {
+                return `${p.playerLogin},${p.playerNickNameWithColor},${p.totalPosition},${p.totalPoints}`
+            });
+        }
 
         const result = challenges.map(c => {
             return {
@@ -55,7 +57,11 @@ class FtpFetch {
                 result.forEach(r => {
                     ftp.put(Readable.from(r.playerStrings.join("\n")), `/TMF07885/Controllers/FAST/data/um/${r.envi}.txt`);
                 })
-                ftp.put(Readable.from(lbString.join("\n")), "/TMF07885/Controllers/FAST/data/um/leaderboard.txt");
+
+                if (leaderboards.length) {
+                    ftp.put(Readable.from(lbString.join("\n")), "/TMF07885/Controllers/FAST/data/um/leaderboard.txt");
+                }
+
                 return ftp.get("/TMF07885/Controllers/FAST/fastlog/matchlog.tmu.unitedmasters01.txt");
             })
             .then(function (stream) {
