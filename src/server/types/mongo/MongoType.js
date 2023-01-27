@@ -28,12 +28,13 @@ class MongoType {
       await this.connect();
       let hasItem = await this.collection.findOne({ _id: item._id });
       if (hasItem) {
-        //console.log(`${this.itemName} exists in database. Maybe update?`);
+        console.log(`${this.itemName} exists in database. Maybe update?`);
         callback && (await callback());
         hasItem = null;
         return 2;
       } else {
         await this.collection.insertOne(item.toJSON());
+        console.log(`Inserted ${this.itemName} into the database.`);
         return 1;
       }
     } finally {

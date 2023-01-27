@@ -1,34 +1,25 @@
 const PromiseFtp = require("promise-ftp");
-const fs = require("fs");
 const FtpUtil = require("../../utils/FtpUtil");
-const MongoLeaderboard = require("../types/mongo/MongoLeaderboard");
-const MongoChallenge = require("../types/mongo/MongoChallenge");
-const Challenge = require("../types/challenge/Challenge");
-const Readable = require('stream').Readable;
+
 
 class FtpFetch {
     async fetchMatchlog() {
-        const mongoLeaderboard = new MongoLeaderboard();
-        const mongoChallenge = new MongoChallenge();
-        const leaderboards = await mongoLeaderboard.getAll();
-        const challengesArr = await mongoChallenge.getAll();
-        const challenges = challengesArr.map(c => new Challenge(c));
 
-        let lbString;
+/*        let lbString;
         if (leaderboards.length) {
             lbString = leaderboards[0].players.map(p => {
                 return `${p.playerLogin},${p.playerNickNameWithColor},${p.totalPosition},${p.totalPoints}`
             });
-        }
+        }*/
 
-        const result = challenges.map(c => {
+/*        const result = challenges.map(c => {
             return {
                 envi: c.envi,
                 playerStrings: c.players.map(p => {
                     return p.exportAsString();
                 })
             }
-        })
+        })*/
 
         // const replays = [];
 
@@ -54,13 +45,13 @@ class FtpFetch {
                 }*/
 
 
-                result.forEach(r => {
+/*                result.forEach(r => {
                     ftp.put(Readable.from(r.playerStrings.join("\n")), `/TMF07885/Controllers/FAST/data/um/${r.envi}.txt`);
                 })
 
                 if (leaderboards.length) {
                     ftp.put(Readable.from(lbString.join("\n")), "/TMF07885/Controllers/FAST/data/um/leaderboard.txt");
-                }
+                }*/
 
                 return ftp.get("/TMF07885/Controllers/FAST/fastlog/matchlog.tmu.unitedmasters01.txt");
             })

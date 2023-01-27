@@ -22,7 +22,10 @@ class Race extends MongoType {
   }
 
   async store() {
-    return await this.insertOrUpdate(this);
+    const result = await this.insertOrUpdate(this);
+    if (result === 1) {
+      console.log("Insertered race: ", this.date);
+    }
   }
 
   getChallenge() {

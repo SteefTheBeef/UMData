@@ -31,12 +31,6 @@ class MongoChallenge extends MongoType {
           player.setBestRace(raceRanking, raceRanking.createdAt, challenge.envi);
         }
 
-        if (challenge.envi === "Alpine") {
-          console.log(race.date);
-          console.log(challenge.players[0].playerLogin)
-          console.log(challenge.players[0].bestRace)
-        }
-
         challenge.setPreviousPointsOnPlayers();
         challenge.updatePoints();
         challenge.addRankHistory(challenge.getLastPlayer().getLastRaceHistory().createdAt);
@@ -90,7 +84,7 @@ class MongoChallenge extends MongoType {
         }
       );
 
-      // console.log("Updated challenge", challenge.name);
+      console.log("Updated challenge", challenge.name);
 
 
       const chall =  await this.collection.findOne({ _id: challenge._id });
