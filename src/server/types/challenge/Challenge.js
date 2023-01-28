@@ -122,6 +122,10 @@ class Challenge {
       if (position === 2) {player.points += 12}
       if (position === 3) {player.points += 6}
       points -= 2;
+      if (points <= 0) {
+        break;
+      }
+      
       position++;
     }
 
@@ -150,6 +154,9 @@ class Challenge {
       if (index === 2) {bestLap.points += 6}
       if (index === 3) {bestLap.points += 3}
       points -= 1;
+      if (points <= 0) {
+        break;
+      }
       index++;
     }
   }
