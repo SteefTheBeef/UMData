@@ -26,6 +26,8 @@ class Race extends MongoType {
     if (result === 1) {
       console.log("Insertered race: ", this.date);
     }
+
+    return result;
   }
 
   getChallenge() {
