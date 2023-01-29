@@ -116,16 +116,16 @@ class Challenge {
 
 
     for (let player of onlyCompleted) {
+      if (points === 0) {
+        break;
+      }
+
       player.points = points;
       player.position = position;
       if (position === 1) {player.points += 24}
       if (position === 2) {player.points += 12}
       if (position === 3) {player.points += 6}
       points -= 2;
-      if (points <= 0) {
-        break;
-      }
-      
       position++;
     }
 
@@ -148,15 +148,17 @@ class Challenge {
     let points = 48;
     let index = 1;
     for (let bestLap of bestLaps) {
+      if (points === 0) {
+        break;
+      }
+
       bestLap.position = index;
       bestLap.points = points;
       if (index === 1) {bestLap.points += 12}
       if (index === 2) {bestLap.points += 6}
       if (index === 3) {bestLap.points += 3}
+
       points -= 1;
-      if (points <= 0) {
-        break;
-      }
       index++;
     }
   }
