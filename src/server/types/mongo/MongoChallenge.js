@@ -15,6 +15,23 @@ class MongoChallenge extends MongoType {
     super("c", "Challenge");
   }
 
+  async cleanStore(challenge) {
+    const result = await this.insertOrUpdate(challenge);
+    if (result === 2) {
+      await this.collection.updateOne(
+          { _id: challenge._id },
+          {
+            $set: {
+              players: challenge.players.map((r) => r.toJSON()),
+            },
+          },
+          {
+            upsert: true,
+          }
+      );
+    }
+  }
+
   async store(race) {
     try {
       await this.connect();

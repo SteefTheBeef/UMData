@@ -103,6 +103,7 @@ class Challenge {
     let position = 1;
     for (let player of this.players) {
       player.points = 0;
+      player.bestLap.points = 0;
     }
 
 /*    if (this.envi === "Alpine") {

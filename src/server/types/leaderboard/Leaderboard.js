@@ -4,7 +4,7 @@ const ArrayUtil = require("../../../utils/ArrayUtil");
 class Leaderboard {
   constructor(props) {
     this._id = "UNITED_MASTERS_QUALIFICATION";
-    this.players = props.players && props.players.length ? props.players.map((p) => new LeaderboardPlayer(p)) : [];
+    this.players = props && props.players && props.players.length ? props.players.map((p) => new LeaderboardPlayer(p)) : [];
   }
 
   updatePoints(challenges) {

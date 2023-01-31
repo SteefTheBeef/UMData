@@ -6,6 +6,23 @@ class MongoLeaderboard extends MongoType {
     super("l", "Leaderboard Item");
   }
 
+  async cleanStore(leaderboard) {
+    const result = await this.insertOrUpdate(leaderboard);
+    if (result === 2) {
+      await this.collection.updateOne(
+          { _id: leaderboard._id },
+          {
+            $set: {
+              players: leaderboard.players.map((p) => p.toJSON()),
+            },
+          },
+          {
+            upsert: true,
+          }
+      );
+    }
+  }
+
   async store(leaderboard, challenges) {
     await this.insertOrUpdate(leaderboard);
 

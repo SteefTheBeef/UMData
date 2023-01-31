@@ -118,16 +118,10 @@ class ChallengePlayer {
   }
 
   createNewRankHistoryObj(createdAt) {
-    const history = this.raceHistory.filter(rh => rh.raceWasCompleted);
-    const lastRaceHistory = history.length ? history[history.length - 1] : {
-      totalTime: null,
-      totalTImeMs: null
-    }
-
     return {
       createdAt: createdAt,
-      totalTime: lastRaceHistory.totalTime,
-      totalTimeMs: lastRaceHistory.totalTimeMs,
+      totalTime: this.bestRace.raceTime,
+      totalTimeMs: this.bestRace.raceTimeMs,
       position: this.position,
       points: this.points,
       totalPoints: this.totalPoints,

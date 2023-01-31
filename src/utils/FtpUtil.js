@@ -1,6 +1,11 @@
 let fs = require('fs');
+const ftpConfig = require("../../config/ftpConfig");
 
-    class FtpUtil {
+class FtpUtil {
+  static async connect(ftp) {
+    return await ftp.connect({ host: ftpConfig.host, user: ftpConfig.user, password: ftpConfig.password })
+  }
+
   static fetchFileList(ftp, path) {
     return new Promise((resolve, reject) => {
       console.log(`Fetching fileList for path: ${path}...`);
@@ -12,12 +17,49 @@ let fs = require('fs');
     });
   }
 
+  static async fetchFiles(ftp, remotePath) {
+    const fileList = await ftp.listSafe([remotePath])
+
+    ftp.end().then(() => {
+      const files = [];
+      // download the files
+
+      if (fileList && fileList.length > 0) {
+        for (let file of fileList) {
+          FtpUtil.connect(ftp).then(async () => {
+            return ftp.get(`${ftpConfig.directories.backup}/${file.name}`);
+
+          })
+          .then(function (stream) {
+            return new Promise(async function (resolve, reject) {
+              stream.once("close", resolve);
+              stream.once("error", reject);
+              const string = await FtpUtil.streamToString(stream);
+              console.log("Downloading matchlog done.");
+            });
+          })
+          .then(function () {
+            console.log("Closing ftp connection.");
+            return ftp.end();
+          });
+
+          //const data = await FtpUtil.streamToBinary(replay);
+          //files.push({fileName: file.name, size: file.size, fileStream});
+        }
+      }
+
+
+      return files;
+    })
+
+  }
+
   static fetchFileAsString(ftpClient, filePath) {
     return new Promise((resolve, reject) => {
       ftpClient.get(filePath, async (err, stream) => {
         if (err) throw err;
 
-        const fileString = await streamToString(stream);
+        const fileString = await FtpUtil.streamToString(stream);
         resolve(fileString);
         stream.once("close", function () {
           ftpClient.end();
