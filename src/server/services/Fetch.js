@@ -10,6 +10,8 @@ const Replay = require("../types/Replay");
 const MongoReplay = require("../types/mongo/MongoReplay");
 const ReplayData = require("../types/ReplayData");
 const MongoReplayData = require("../types/mongo/MongoReplayData");
+const mongoConfig = require("../types/mongo/mongoConfig");
+const umBot = require("../../../UMBot");
 const mongoLeaderboard = new MongoLeaderboard();
 const mongoChallenge = new MongoChallenge();
 const mongoReplay = new MongoReplay();
@@ -30,87 +32,72 @@ class Fetch {
     return this.engine.connect();
   }
 
-  async fetchMatchlog() {
-    const matchlog = await this.engine.fetchMatchlog();
+  async fetchMatchlog(ftp) {
+    const matchlogs = await this.engine.fetchMatchlog(ftp);
 
-    let races = [];
+    for (let matchlogEntry of matchlogs) {
+      console.log("Using db: ", matchlogEntry.db);
+      let races = [];
 
-    let logEntries = matchlog[0].split("###");
-    //console.log("matchlog[1]", matchlog[1])
-/*    const newReps = [];
-    const newRepsData = [];
-    const replays = matchlog[1].forEach(r => {
-      const rep = Replay.create(r);
-      const repData = new ReplayData({
-        replayId: rep._id,
-        data: r.data
-      });
+      let logEntries = matchlogEntry.matchlog.split("###");
 
-      newReps.push(rep);
-      newRepsData.push(repData);
-    })
+      for (let raceEntry of logEntries) {
+        //console.log(raceEntry);
+        if (raceEntry.trim().length > 0 && raceEntry.indexOf("LAPS MATCH") > -1) {
+          try {
+            const race = RaceFactory.create(matchlogEntry.db, raceEntry);
 
-    const existingReplays = await mongoReplay.getAll();
-    let index = 0;
-    for (let r of newReps) {
-      const hasBetter = existingReplays.some(rep => {
-        return rep.challengeName === r.challengeName && rep.playerLogin === r.playerLogin && rep.timeMs <= r.timeMs;
-      })
-
-      //only insert replay if it is better than the current best one
-      if (!hasBetter) {
-        await mongoReplay.store(r);
-        await mongoReplayData.store(newRepsData[index]);
-      }
-      index++;
-    }*/
-
-
-    for (let raceEntry of logEntries) {
-      //console.log(raceEntry);
-      if (raceEntry.trim().length > 0 && raceEntry.indexOf("LAPS MATCH") > -1) {
-        try {
-          const race = RaceFactory.create(raceEntry);
-
-          races.push(race);
-          //console.log(race.raceRankings);
-        } catch (e) {
-          console.log(e);
+            races.push(race);
+            //console.log(race.raceRankings);
+          } catch (e) {
+            console.log(e);
+          }
         }
+
+
+        logEntries = [];
+      }
+      // filter out races that does not have any participants.
+      races = races.filter((race) => race.raceRankings.length > 0);
+
+      let players = [];
+
+      // insert new races
+      let index = 0;
+      for (const race of races) {
+        if ((await race.store()) === 1) {
+          players = players.concat(race.players);
+          const mongoLeaderboard = new MongoLeaderboard(matchlogEntry.db);
+          const mongoChallenge = new MongoChallenge(matchlogEntry.db);
+
+          const improvedPlayers = await mongoChallenge.store(race);
+          improvedPlayers.forEach(p => {
+            umBot.sendNewRecordMessage(race, p, matchlogEntry.lapsCount)
+          })
+          const temp = await mongoChallenge.getAll();
+          let challenges = temp.map((t) => {
+            return new Challenge(t);
+          });
+          await mongoLeaderboard.store(new Leaderboard({}), challenges);
+          // clear mem
+          challenges = [];
+
+        }
+        console.log("Race index ", index);
+        index++;
       }
 
-
-      logEntries = [];
-    }
-    // filter out races that does not have any participants.
-    races = races.filter((race) => race.raceRankings.length > 0);
-
-    let players = [];
-
-    // insert new races
-    for (const race of races) {
-      if ((await race.store()) === 1) {
-        players = players.concat(race.players);
-        const challenge = await mongoChallenge.store(race);
-        const temp = await mongoChallenge.getAll();
-        let challenges = temp.map((t) => {
-          return new Challenge(t);
-        });
-        await mongoLeaderboard.store(new Leaderboard({}), challenges);
-        // clear mem
-        challenges = [];
+      // Insert/update players
+      for (const player of players) {
+        await player.store();
       }
+
+      // clear mem
+      players = [];
+      races = [];
     }
 
-    // Insert/update players
-    for (const player of players) {
-      await player.store();
-    }
-
-    // clear mem
-    players = [];
-    races = [];
-
+    return matchlogs;
   }
 }
 

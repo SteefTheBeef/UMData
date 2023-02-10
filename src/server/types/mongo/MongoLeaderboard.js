@@ -2,8 +2,8 @@ const Leaderboard = require("../leaderboard/Leaderboard");
 const MongoType = require("./MongoType");
 
 class MongoLeaderboard extends MongoType {
-  constructor(props = {}) {
-    super("l", "Leaderboard Item");
+  constructor(db) {
+    super(db, "l", "Leaderboard Item");
   }
 
   async cleanStore(leaderboard) {

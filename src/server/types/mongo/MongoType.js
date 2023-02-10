@@ -6,13 +6,14 @@ class MongoType {
    *
    * @param {string} collection - Name of mongo collection
    */
-  constructor(collectionName = "", itemName = "", immutable = false) {
+  constructor(db, collectionName = "", itemName = "", immutable = false) {
+    this.db = db;
     this._id = null;
     this.itemName = itemName;
     this.collectionName = collectionName;
     this.immutable = immutable;
     this.client = new MongoClient(mongoConfig.uri);
-    this.collection = this.client.db(mongoConfig.db).collection(collectionName);
+    this.collection = this.client.db(db).collection(collectionName);
   }
 
   async connect() {
@@ -28,13 +29,13 @@ class MongoType {
       await this.connect();
       let hasItem = await this.collection.findOne({ _id: item._id });
       if (hasItem) {
-        console.log(`${this.itemName} exists in database. Maybe update?`);
+        console.log(`${this.itemName} exists in collection. Maybe update?`);
         callback && (await callback());
         hasItem = null;
         return 2;
       } else {
         await this.collection.insertOne(item.toJSON());
-        console.log(`Inserted ${this.itemName} into the database.`);
+        console.log(`Inserted ${this.itemName} into the database ${this.db}`);
         return 1;
       }
     } finally {

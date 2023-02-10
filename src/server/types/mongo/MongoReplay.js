@@ -1,8 +1,8 @@
 const MongoType = require("./MongoType");
 
 class MongoReplay extends MongoType {
-  constructor(props = {}) {
-    super("replays", "Replay Item");
+  constructor(db) {
+    super(db,"replays", "Replay Item");
   }
 
   async store(replay) {

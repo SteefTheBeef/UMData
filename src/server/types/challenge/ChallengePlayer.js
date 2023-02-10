@@ -160,11 +160,14 @@ class ChallengePlayer {
   setBestRace(newRaceRanking, updatedAt, envi) {
     if (!this.bestRace || newRaceRanking.completedCheckpointsCount > this.bestRace.completedCheckpointsCount) {
       this.addBestRace(newRaceRanking, updatedAt);
+      return true;
     } else if(newRaceRanking.completedCheckpointsCount === this.bestRace.completedCheckpointsCount) {
       if (newRaceRanking.raceTimeMs < this.bestRace.raceTimeMs) {
         this.addBestRace(newRaceRanking, updatedAt);
+        return true;
       }
     }
+    return false;
   }
 
   addBestRace(newRaceRanking, updatedAt) {
@@ -180,6 +183,13 @@ class ChallengePlayer {
       completedLapsCount: newRaceRanking.completedLapsCount,
       completedCheckpointsCount: newRaceRanking.completedCheckpointsCount,
     })
+  }
+
+  getNickName(stripColors) {
+    if (stripColors) {
+      return this.playerNickName || this.playerLogin;
+    }
+    return this.playerNickNameWithColor || this.playerNickName || this.playerLogin;
   }
 
   exportAsString() {

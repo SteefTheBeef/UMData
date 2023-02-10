@@ -10,8 +10,8 @@ class Player extends MongoType {
    * @param {string} props.nickNameWithColor - nickNameWithColor
    * @param {string} props.lastSeen - date
    */
-  constructor(props = {}) {
-    super("players", "Player");
+  constructor(db, props = {}) {
+    super(db, "players", "Player");
 
     this._id = props._id;
     this.login = props.login;

@@ -11,8 +11,8 @@ function sortByTotalPoints(ranking1, ranking2) {
 }
 
 class MongoChallenge extends MongoType {
-  constructor() {
-    super("c", "Challenge");
+  constructor(db) {
+    super(db,"c", "Challenge");
   }
 
   async cleanStore(challenge) {
@@ -33,6 +33,7 @@ class MongoChallenge extends MongoType {
   }
 
   async store(race) {
+    const hasImproved = [];
     try {
       await this.connect();
       let existingChallenge = await this.collection.findOne({
@@ -46,6 +47,7 @@ class MongoChallenge extends MongoType {
           const player = challenge.addPlayerFromRaceRanking(raceRanking);
           player.setBestLap(raceRanking);
           player.setBestRace(raceRanking, raceRanking.createdAt, challenge.envi);
+          hasImproved.push(player);
         }
 
         challenge.setPreviousPointsOnPlayers();
@@ -70,7 +72,9 @@ class MongoChallenge extends MongoType {
           createdAt = raceRanking.createdAt;
           currentPlayer.addRace(raceRanking);
           currentPlayer.setBestLap(raceRanking);
-          currentPlayer.setBestRace(raceRanking, createdAt, challenge.envi);
+          if(currentPlayer.setBestRace(raceRanking, createdAt, challenge.envi)) {
+            hasImproved.push(currentPlayer);
+          }
 
         } else {
           // player is unranked on this challenge. Insert new ranking.
@@ -78,7 +82,9 @@ class MongoChallenge extends MongoType {
           createdAt = raceRanking.createdAt;
           currentPlayer = challenge.addPlayerFromRaceRanking(raceRanking);
           currentPlayer.setBestLap(raceRanking);
-          currentPlayer.setBestRace(raceRanking, createdAt, challenge.envi);
+          if(currentPlayer.setBestRace(raceRanking, createdAt, challenge.envi)){
+            hasImproved.push(currentPlayer);
+          }
         }
       }
 
@@ -88,6 +94,13 @@ class MongoChallenge extends MongoType {
       if (challenge.hasPointsChanged()) {
         challenge.addRankHistory(createdAt);
       }
+
+      const improvedTop10 = hasImproved.filter(p => {
+        const lastRank = p.getLastRankHistory();
+        const lastRace = p.getLastRaceHistory();
+
+        return lastRank.position < 16 && lastRace.totalTimeMs === lastRank.totalTimeMs && lastRace.raceWasCompleted;
+      })
 
       await this.collection.updateOne(
         { _id: challenge._id },
@@ -103,13 +116,8 @@ class MongoChallenge extends MongoType {
 
       console.log("Updated challenge", challenge.name);
 
+      return improvedTop10;
 
-      const chall =  await this.collection.findOne({ _id: challenge._id });
-
-      // clear memory
-      challenge = null;
-
-      return new Challenge(chall);
     } catch (e) {
       console.log(e);
     } finally {

@@ -22,10 +22,17 @@ class TimeUtil {
    * @param time - 01:04.01
    */
   static raceTimeToMilliSeconds(time) {
-    const mins = parseInt(time.substring(0, 2), 10);
-    const seconds = parseInt(time.substring(3, 5), 10);
-    const hundreds = parseInt(time.substring(6, 8), 10);
-    return mins * 60 * 1000 + seconds * 1000 + hundreds * 10;
+    try {
+      const parts1 = time.split(":");
+      const mins = parseInt(parts1[0], 10);
+
+      const parts2 = parts1[1].split(".");
+      const seconds = parseInt(parts2[0], 10);
+      const hundreds = parseInt(parts2[1], 10);
+      return mins * 60 * 1000 + seconds * 1000 + hundreds * 10;
+    } catch (e) {
+      return 0;
+    }
   }
 
   static raceTimeToMilliSeconds1(time) {
@@ -42,14 +49,17 @@ class TimeUtil {
   static getMillisFromReplayName(replayName) {
     try {
       const first = replayName.split("(");
-      const time = first[1].split(")")[0];
-      const msArr = time.split("''");
-      const ms = parseInt(msArr[1], 10);
-      const seconds = parseInt(msArr[0].split("'")[1]);
-      const minutes = parseInt(msArr[0].split("'")[0]);
+      if (first[1]) {
+        const time = first[1].split(")")[0];
+        const msArr = time.split("''");
+        const ms = parseInt(msArr[1], 10);
+        const seconds = parseInt(msArr[0].split("'")[1]);
+        const minutes = parseInt(msArr[0].split("'")[0]);
+        return minutes * 60 * 1000 + seconds * 1000 + ms;
+      }
 
+      return null;
 
-      return minutes * 60 * 1000 + seconds * 1000 + ms;
     } catch(e) {
       console.log(e);
       return 0;

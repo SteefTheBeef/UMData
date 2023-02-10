@@ -26,11 +26,11 @@ class RaceFactory {
    * --------------------
    * @returns {Race}
    */
-  static create(rawString) {
+  static create(db, rawString) {
     const rows = rawString.split(/\r?\n/);
 
     const raceInfo = RaceFactory.createRaceInfo(rows);
-    const players = RaceFactory.createPlayers(rows, raceInfo.date);
+    const players = RaceFactory.createPlayers(db, rows, raceInfo.date);
     let raceRankings = RaceFactory.createRankings(rows, players, raceInfo.date).filter((r) => !!r);
     const rawCheckpoints = RaceFactory.createCheckpoints(rows);
    // const checkpoints = RaceFactory.createNormalCheckpoints(rows);
@@ -64,7 +64,7 @@ class RaceFactory {
       return r;
     });
 
-    return new Race({
+    return new Race(db, {
       _id: raceInfo._id,
       date: raceInfo.date,
       gameMode: raceInfo.gameMode,
@@ -232,11 +232,11 @@ class RaceFactory {
     return result[0];
   }
 
-  static createPlayers(rows, date) {
+  static createPlayers(db, rows, date) {
     return RaceFactory.createCollection(rows, "* Players:", (row) => {
       const items = row.split(",");
       if (items.length > 1) {
-        return new Player({
+        return new Player(db, {
           _id: items[0].trim(),
           login: items[0].trim(),
           nickName: items[1].trim(),

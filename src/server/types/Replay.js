@@ -24,17 +24,27 @@ class Replay {
     };
   }
 
-  static create(props) {
+  static create(fileName) {
+    const props = {};
 
     try {
-      props._id = CommonUtils.generateGUID();
-      props.timeMs = TimeUtil.getMillisFromReplayName(props.fileName);
-      props.lapsCount = props.fileName.split("[")[1].split(" ")[0];
-      const nameItems = props.fileName.split("(")[0].split("_");
-      props.playerLogin = nameItems.pop();
-      props.challengeName = nameItems.join("_");
+      if (fileName) {
+        props._id = CommonUtils.generateGUID();
+        //console.log("Replay.create", fileName);
+        props.timeMs = TimeUtil.getMillisFromReplayName(fileName);
+        if (!props.timeMs) {
+          return null;
+        }
 
-      return new Replay(props);
+        props.fileName = fileName;
+        props.lapsCount = fileName.split("[")[1].split(" ")[0];
+        const nameItems = fileName.split("(")[0].split("_");
+        props.playerLogin = nameItems.pop();
+        props.challengeName = nameItems.join("_");
+
+        return new Replay(props);
+      }
+      return null;
     } catch (e) {
       console.log(e);
     }

@@ -22,9 +22,7 @@ class FetchBackups {
                     const string = await FtpUtil.streamToString(stream);
                     console.log("Fetching file: ", file.name, " done.");
                     file.stringData = string;
-                    console.log("index, ", index);
-                    console.log("fileList.length, ", fileList.length);
-                    if (index === 1) {
+                    if (index === fileList.length) {
                         resolve(fileList);
                     }
 

@@ -2,8 +2,8 @@ const MongoType = require("./mongo/MongoType");
 const Challenge = require("./challenge/Challenge");
 
 class Race extends MongoType {
-  constructor(props) {
-    super("r", "Race", true);
+  constructor(db, props) {
+    super(db, "r", "Race", true);
     if (props) {
       this._id = props._id;
       this.date = props.date;
